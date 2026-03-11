@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Ads × GA4 — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f14;
+    --surface: #16181f;
+    --surface2: #1e2029;
+    --border: #2a2d3a;
+    --google-blue: #4285F4;
+    --google-green: #34A853;
+    --google-yellow: #FBBC05;
+    --google-red: #EA4335;
+    --accent: #4285F4;
+    --text: #e8eaf0;
+    --muted: #7b8096;
+    --positive: #34A853;
+    --negative: #EA4335;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .dot-g { width: 8px; height: 8px; border-radius: 50%; background: var(--google-blue); }
+  .dot-a { width: 8px; height: 8px; border-radius: 50%; background: var(--google-red); }
+  .dot-4 { width: 8px; height: 8px; border-radius: 50%; background: var(--google-yellow); }
+
+  .report-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .date-range {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .date-range span { color: var(--text); font-weight: 500; }
+
+  .btn-compare {
+    background: rgba(66, 133, 244, 0.12);
+    border: 1px solid rgba(66, 133, 244, 0.3);
+    color: var(--google-blue);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    color: var(--google-blue);
+    border-bottom-color: var(--google-blue);
+  }
+
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 28px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* SCORECARDS */
+  .scorecards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .scorecard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .scorecard:hover { border-color: #3a3e52; }
+
+  .scorecard::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .scorecard.blue::before { background: var(--google-blue); }
+  .scorecard.green::before { background: var(--google-green); }
+  .scorecard.yellow::before { background: var(--google-yellow); }
+  .scorecard.red::before { background: var(--google-red); }
+  .scorecard.purple::before { background: #8b5cf6; }
+
+  .sc-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .sc-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .sc-delta {
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sc-delta.up { color: var(--positive); }
+  .sc-delta.down { color: var(--negative); }
+
+  .sc-delta .arrow { font-size: 14px; }
+
+  .sc-compare {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* CHARTS ROW */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 14px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* SVG CHART */
+  .svg-chart { width: 100%; overflow: visible; }
+
+  /* DONUT CHART */
+  .donut-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .donut-legend { flex: 1; }
+
+  .donut-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .donut-item:last-child { border-bottom: none; }
+
+  .donut-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .donut-item-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* TABLES ROW */
+  .tables-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header-row {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .table-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .table-badge {
+    font-size: 11px;
+    background: rgba(66, 133, 244, 0.12);
+    color: var(--google-blue);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-weight: 600;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th:not(:first-child) { text-align: right; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 11px 16px;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  tbody td:not(:first-child) {
+    text-align: right;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+
+  .page-path {
+    color: var(--google-blue);
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bar-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .mini-bar {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(66, 133, 244, 0.25);
+    width: 60px;
+    overflow: hidden;
+  }
+
+  .mini-bar-fill {
+    height: 100%;
+    background: var(--google-blue);
+    border-radius: 2px;
+  }
+
+  .badge-pos {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .badge-green { background: rgba(52, 168, 83, 0.15); color: var(--google-green); }
+  .badge-red { background: rgba(234, 67, 53, 0.15); color: var(--google-red); }
+  .badge-yellow { background: rgba(251, 188, 5, 0.15); color: var(--google-yellow); }
+
+  /* BOTTOM ROW */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+
+  .filter-note {
+    background: rgba(66, 133, 244, 0.06);
+    border: 1px solid rgba(66, 133, 244, 0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--google-blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .filter-note code {
+    background: rgba(66, 133, 244, 0.12);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+  }
+
+  /* SPARKLINE */
+  .sparkline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sparkline-row:last-child { border-bottom: none; }
+
+  .spark-label { font-size: 12px; color: var(--muted); }
+  .spark-value { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
+
+  /* TOOLTIP SIMULATION */
+  .tooltip-badge {
+    position: absolute;
+    background: #fff;
+    color: #1a1a2e;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    top: 60px;
+    left: 45%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  .tooltip-badge::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #fff;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-badge">
+      <div class="dot-g"></div><div class="dot-a"></div><div class="dot-4"></div>
+      <span style="color:#7b8096; margin-left:4px;">Looker Studio</span>
+    </div>
+    <div style="width:1px; height:20px; background:var(--border);"></div>
+    <div class="report-title">Google Ads × GA4 — Performance de Páginas</div>
+  </div>
+  <div class="header-right">
+    <div class="date-range">
+      📅 <span>01/02/2025 – 28/02/2025</span>
+    </div>
+    <div class="date-range">
+      vs <span>Jan 2025</span>
+    </div>
+    <div class="btn-compare">⟳ Atualizar</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="nav-tabs">
+  <div class="tab active">Visão Geral</div>
+  <div class="tab">Performance por Página</div>
+  <div class="tab">Performance por Campanha</div>
+  <div class="tab">Palavras-chave</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- FILTER NOTE -->
+  <div class="filter-note">
+    🔍 Filtro ativo: <code>session_source / medium = google / cpc</code> — Exibindo apenas tráfego pago via Google Ads
+  </div>
+
+  <!-- SCORECARDS -->
+  <div class="section-label">Métricas principais — Fevereiro 2025</div>
+  <div class="scorecards">
+    <div class="scorecard blue">
+      <div class="sc-label">Cliques (Ads)</div>
+      <div class="sc-value">48.320</div>
+      <div class="sc-delta up"><span class="arrow">↑</span> +12,4%</div>
+      <div class="sc-compare">vs 43.012 em Jan</div>
+    </div>
+    <div class="scorecard green">
+      <div class="sc-label">Sessões (GA4)</div>
+      <div class="sc-value">39.870</div>
+      <div class="sc-delta up"><span class="arrow">↑</span> +9,8%</div>
+      <div class="sc-compare">vs 36.312 em Jan</div>
+    </div>
+    <div class="scorecard yellow">
+      <div class="sc-label">Conversões</div>
+      <div class="sc-value">1.245</div>
+      <div class="sc-delta up"><span class="arrow">↑</span> +18,2%</div>
+      <div class="sc-compare">vs 1.053 em Jan</div>
+    </div>
+    <div class="scorecard red">
+      <div class="sc-label">Custo Total</div>
+      <div class="sc-value">R$28.4k</div>
+      <div class="sc-delta down"><span class="arrow">↓</span> −3,1%</div>
+      <div class="sc-compare">vs R$29.3k em Jan</div>
+    </div>
+    <div class="scorecard purple">
+      <div class="sc-label">CPA Médio</div>
+      <div class="sc-value">R$22,8</div>
+      <div class="sc-delta up"><span class="arrow">↑</span> −18,6%</div>
+      <div class="sc-compare">vs R$28,0 em Jan</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="section-label">Evolução temporal</div>
+  <div class="charts-row">
+
+    <!-- LINE CHART -->
+    <div class="chart-card" style="position:relative;">
+      <div class="chart-header">
+        <div class="chart-title">Sessões via Google Ads — Últimos 28 dias</div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#4285F4"></div>Fev 2025</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#5f6368; border: 1px dashed #aaa;"></div>Jan 2025</div>
+        </div>
+      </div>
+
+      <div class="tooltip-badge">📍 Dia 14 — 1.820 sessões</div>
+
+      <svg class="svg-chart" height="160" viewBox="0 0 700 160">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#4285F4" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#4285F4" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Grid lines -->
+        <line x1="0" y1="130" x2="700" y2="130" stroke="#2a2d3a" stroke-width="1"/>
+        <line x1="0" y1="97" x2="700" y2="97" stroke="#2a2d3a" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="64" x2="700" y2="64" stroke="#2a2d3a" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="0" y1="31" x2="700" y2="31" stroke="#2a2d3a" stroke-width="1" stroke-dasharray="4,4"/>
+
+        <!-- Y labels -->
+        <text x="0" y="134" fill="#5f6368" font-size="10" font-family="Space Mono">0</text>
+        <text x="0" y="101" fill="#5f6368" font-size="10" font-family="Space Mono">500</text>
+        <text x="0" y="68" fill="#5f6368" font-size="10" font-family="Space Mono">1k</text>
+        <text x="0" y="35" fill="#5f6368" font-size="10" font-family="Space Mono">1.5k</text>
+
+        <!-- Jan (dashed gray) -->
+        <polyline
+          fill="none"
+          stroke="#5f6368"
+          stroke-width="1.5"
+          stroke-dasharray="5,3"
+          points="30,98 55,90 80,95 105,80 130,75 155,85 180,70 205,88 230,72 255,68 280,78 305,66 330,80 355,74 380,82 405,70 430,76 455,68 480,74 505,80 530,72 555,65 580,70 605,78 630,74 655,68 680,72"
+        />
+
+        <!-- Feb area -->
+        <polygon
+          fill="url(#lineGrad)"
+          points="30,92 55,84 80,75 105,88 130,68 155,74 180,60 205,70 230,56 255,62 280,50 305,58 330,68 355,55 380,70 405,54 430,62 455,44 480,50 505,60 530,48 555,40 580,52 605,45 630,56 655,44 680,50 680,130 30,130"
+        />
+
+        <!-- Feb line -->
+        <polyline
+          fill="none"
+          stroke="#4285F4"
+          stroke-width="2.5"
+          stroke-linejoin="round"
+          points="30,92 55,84 80,75 105,88 130,68 155,74 180,60 205,70 230,56 255,62 280,50 305,58 330,68 355,55 380,70 405,54 430,62 455,44 480,50 505,60 530,48 555,40 580,52 605,45 630,56 655,44 680,50"
+        />
+
+        <!-- Tooltip dot -->
+        <circle cx="355" cy="55" r="5" fill="#4285F4" stroke="#0e0f14" stroke-width="2"/>
+        <line x1="355" y1="55" x2="355" y2="130" stroke="#4285F4" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+
+        <!-- X labels (some) -->
+        <text x="28" y="148" fill="#5f6368" font-size="9" font-family="Space Mono">01/02</text>
+        <text x="178" y="148" fill="#5f6368" font-size="9" font-family="Space Mono">08/02</text>
+        <text x="330" y="148" fill="#5f6368" font-size="9" font-family="Space Mono">15/02</text>
+        <text x="478" y="148" fill="#5f6368" font-size="9" font-family="Space Mono">22/02</text>
+        <text x="628" y="148" fill="#5f6368" font-size="9" font-family="Space Mono">28/02</text>
+      </svg>
+    </div>
+
+    <!-- DONUT CHART -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Distribuição de Conversões</div>
+      </div>
+
+      <div class="donut-container">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <!-- Donut segments -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#1e2029" stroke-width="22"/>
+          <!-- Search: 48% -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#4285F4" stroke-width="22"
+            stroke-dasharray="138.5 288.5" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+          <!-- Shopping: 26% -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#34A853" stroke-width="22"
+            stroke-dasharray="75 352" stroke-dashoffset="-138.5" transform="rotate(-90 60 60)"/>
+          <!-- Display: 15% -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#FBBC05" stroke-width="22"
+            stroke-dasharray="43 384" stroke-dashoffset="-213.5" transform="rotate(-90 60 60)"/>
+          <!-- PMax: 11% -->
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#EA4335" stroke-width="22"
+            stroke-dasharray="32 395" stroke-dashoffset="-256.5" transform="rotate(-90 60 60)"/>
+          <!-- Center text -->
+          <text x="60" y="56" text-anchor="middle" fill="#e8eaf0" font-size="18" font-weight="700" font-family="Space Mono">1.245</text>
+          <text x="60" y="70" text-anchor="middle" fill="#7b8096" font-size="9" font-family="DM Sans">conversões</text>
+        </svg>
+
+        <div class="donut-legend">
+          <div class="donut-item">
+            <div class="donut-item-left">
+              <div class="legend-dot" style="background:#4285F4"></div> Search
+            </div>
+            <div class="donut-item-pct">48%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left">
+              <div class="legend-dot" style="background:#34A853"></div> Shopping
+            </div>
+            <div class="donut-item-pct">26%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left">
+              <div class="legend-dot" style="background:#FBBC05"></div> Display
+            </div>
+            <div class="donut-item-pct">15%</div>
+          </div>
+          <div class="donut-item">
+            <div class="donut-item-left">
+              <div class="legend-dot" style="background:#EA4335"></div> PMax
+            </div>
+            <div class="donut-item-pct">11%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLES ROW -->
+  <div class="section-label">Performance por página & campanha</div>
+  <div class="tables-row">
+
+    <!-- PAGE TABLE -->
+    <div class="table-card">
+      <div class="table-header-row">
+        <div class="table-title">Top Páginas de Destino</div>
+        <div class="table-badge">GA4 — cpc</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Página</th>
+            <th>Sessões</th>
+            <th>Conv.</th>
+            <th>Eng. %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="page-path">/produtos/plano-pro</div></td>
+            <td>
+              <div class="bar-cell">
+                8.420
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:100%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-green">+312</span></td>
+            <td>74%</td>
+          </tr>
+          <tr>
+            <td><div class="page-path">/landing/black-friday</div></td>
+            <td>
+              <div class="bar-cell">
+                6.130
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:73%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-green">+228</span></td>
+            <td>68%</td>
+          </tr>
+          <tr>
+            <td><div class="page-path">/categoria/notebooks</div></td>
+            <td>
+              <div class="bar-cell">
+                5.890
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:70%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-yellow">+187</span></td>
+            <td>61%</td>
+          </tr>
+          <tr>
+            <td><div class="page-path">/home</div></td>
+            <td>
+              <div class="bar-cell">
+                4.340
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:52%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-yellow">+124</span></td>
+            <td>55%</td>
+          </tr>
+          <tr>
+            <td><div class="page-path">/contato</div></td>
+            <td>
+              <div class="bar-cell">
+                3.210
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:38%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-red">+89</span></td>
+            <td>42%</td>
+          </tr>
+          <tr>
+            <td><div class="page-path">/sobre-nos</div></td>
+            <td>
+              <div class="bar-cell">
+                1.880
+                <div class="mini-bar"><div class="mini-bar-fill" style="width:22%"></div></div>
+              </div>
+            </td>
+            <td><span class="badge-pos badge-red">+41</span></td>
+            <td>38%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CAMPAIGN TABLE -->
+    <div class="table-card">
+      <div class="table-header-row">
+        <div class="table-title">Performance por Campanha</div>
+        <div class="table-badge">Google Ads</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Campanha</th>
+            <th>Cliques</th>
+            <th>Custo</th>
+            <th>CPA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">Brand — Search</div><div style="font-size:10px; color:var(--muted);">Search</div></td>
+            <td>14.230</td>
+            <td>R$6.8k</td>
+            <td><span class="badge-pos badge-green">R$14</span></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">Produtos — PMax</div><div style="font-size:10px; color:var(--muted);">Performance Max</div></td>
+            <td>11.480</td>
+            <td>R$9.2k</td>
+            <td><span class="badge-pos badge-yellow">R$23</span></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">Concorrentes</div><div style="font-size:10px; color:var(--muted);">Search</div></td>
+            <td>8.340</td>
+            <td>R$7.4k</td>
+            <td><span class="badge-pos badge-yellow">R$28</span></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">Remarketing</div><div style="font-size:10px; color:var(--muted);">Display</div></td>
+            <td>7.120</td>
+            <td>R$3.1k</td>
+            <td><span class="badge-pos badge-green">R$18</span></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">Shopping — Geral</div><div style="font-size:10px; color:var(--muted);">Shopping</div></td>
+            <td>4.900</td>
+            <td>R$1.9k</td>
+            <td><span class="badge-pos badge-red">R$42</span></td>
+          </tr>
+          <tr>
+            <td><div style="font-size:12px; font-weight:600;">YouTube Ads</div><div style="font-size:10px; color:var(--muted);">Vídeo</div></td>
+            <td>2.250</td>
+            <td>R$1.0k</td>
+            <td><span class="badge-pos badge-red">R$55</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="section-label">Métricas de qualidade</div>
+  <div class="bottom-row">
+
+    <!-- ENGAGEMENT -->
+    <div class="chart-card">
+      <div class="chart-title" style="margin-bottom:16px;">Taxa de Engajamento por Tipo</div>
+      <svg width="100%" height="90" viewBox="0 0 300 90">
+        <!-- Search -->
+        <text x="0" y="18" fill="#7b8096" font-size="11" font-family="DM Sans">Search</text>
+        <rect x="70" y="6" width="175" height="12" rx="6" fill="#1e2029"/>
+        <rect x="70" y="6" width="131" height="12" rx="6" fill="#4285F4"/>
+        <text x="253" y="17" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">75%</text>
+
+        <!-- Shopping -->
+        <text x="0" y="43" fill="#7b8096" font-size="11" font-family="DM Sans">Shopping</text>
+        <rect x="70" y="31" width="175" height="12" rx="6" fill="#1e2029"/>
+        <rect x="70" y="31" width="114" height="12" rx="6" fill="#34A853"/>
+        <text x="253" y="42" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">65%</text>
+
+        <!-- Display -->
+        <text x="0" y="68" fill="#7b8096" font-size="11" font-family="DM Sans">Display</text>
+        <rect x="70" y="56" width="175" height="12" rx="6" fill="#1e2029"/>
+        <rect x="70" y="56" width="79" height="12" rx="6" fill="#FBBC05"/>
+        <text x="253" y="67" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">45%</text>
+
+        <!-- PMax -->
+        <text x="0" y="93" fill="#7b8096" font-size="11" font-family="DM Sans">PMax</text>
+        <rect x="70" y="81" width="175" height="12" rx="6" fill="#1e2029"/>
+        <rect x="70" y="81" width="96" height="12" rx="6" fill="#EA4335"/>
+        <text x="253" y="92" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">55%</text>
+      </svg>
+    </div>
+
+    <!-- QUALITY METRICS -->
+    <div class="chart-card">
+      <div class="chart-title" style="margin-bottom:16px;">Indicadores de Qualidade</div>
+      <div class="sparkline-row">
+        <div class="spark-label">CTR médio</div>
+        <div class="spark-value" style="color:#4285F4">5,82%</div>
+      </div>
+      <div class="sparkline-row">
+        <div class="spark-label">CPC médio</div>
+        <div class="spark-value" style="color:#34A853">R$0,59</div>
+      </div>
+      <div class="sparkline-row">
+        <div class="spark-label">Impressões</div>
+        <div class="spark-value">830k</div>
+      </div>
+      <div class="sparkline-row">
+        <div class="spark-label">Taxa de conversão</div>
+        <div class="spark-value" style="color:#FBBC05">3,12%</div>
+      </div>
+      <div class="sparkline-row">
+        <div class="spark-label">ROAS estimado</div>
+        <div class="spark-value" style="color:#34A853">4,8×</div>
+      </div>
+    </div>
+
+    <!-- TOP DEVICES -->
+    <div class="chart-card">
+      <div class="chart-title" style="margin-bottom:16px;">Sessões por Dispositivo</div>
+      <svg width="100%" height="130" viewBox="0 0 260 130">
+        <!-- Mobile bar -->
+        <text x="0" y="18" fill="#7b8096" font-size="11" font-family="DM Sans">📱 Mobile</text>
+        <rect x="70" y="6" width="145" height="14" rx="7" fill="#1e2029"/>
+        <rect x="70" y="6" width="100" height="14" rx="7" fill="#4285F4" opacity="0.9"/>
+        <text x="222" y="18" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">69%</text>
+
+        <!-- Desktop bar -->
+        <text x="0" y="50" fill="#7b8096" font-size="11" font-family="DM Sans">🖥️ Desktop</text>
+        <rect x="70" y="38" width="145" height="14" rx="7" fill="#1e2029"/>
+        <rect x="70" y="38" width="40" height="14" rx="7" fill="#8b5cf6" opacity="0.9"/>
+        <text x="222" y="50" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">27%</text>
+
+        <!-- Tablet bar -->
+        <text x="0" y="82" fill="#7b8096" font-size="11" font-family="DM Sans">📲 Tablet</text>
+        <rect x="70" y="70" width="145" height="14" rx="7" fill="#1e2029"/>
+        <rect x="70" y="70" width="6" height="14" rx="3" fill="#34A853" opacity="0.9"/>
+        <text x="222" y="82" fill="#e8eaf0" font-size="11" font-family="Space Mono" font-weight="700">4%</text>
+
+        <!-- Divider -->
+        <line x1="0" y1="100" x2="260" y2="100" stroke="#2a2d3a" stroke-width="1"/>
+        <text x="0" y="120" fill="#5f6368" font-size="10" font-family="DM Sans">Total: 39.870 sessões via cpc</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="margin-top:32px; padding-top:16px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+    <div style="font-size:11px; color:var(--muted);">
+      Dados: Google Analytics 4 × Google Ads API · Atualizado em 28/02/2025 às 09:00
+    </div>
+    <div style="font-size:11px; color:var(--muted); display:flex; gap:16px;">
+      <span>📊 Looker Studio</span>
+      <span>|</span>
+      <span>Filtro: <code style="background:var(--surface2); padding:1px 5px; border-radius:3px; font-family: Space Mono, monospace;">google / cpc</code></span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
